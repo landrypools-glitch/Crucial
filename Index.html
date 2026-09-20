@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landry Pools CRM - Custom Inground Pool Construction</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            navy: '#0B192C',
+                            blue: '#1E3E62',
+                            sky: '#008DDA',
+                            light: '#F5F5F7',
+                            accent: '#FF6F59' /* Warm Texas terracotta accent */
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .kanban-col { min-height: 500px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.25s ease-out forwards; }
+    </style>
+</head>
+<body class="h-full bg-slate-100 text-slate-800 font-sans antialiased flex flex-col">
+
+    <header class="bg-brand-navy text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-sky flex items-center justify-center shadow-lg text-white font-bold text-xl">
+                    <i class="fa-solid fa-water-ladder"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-wide">LANDRY POOLS <span class="text-brand-accent text-xs px-2 py-0.5 rounded-full bg-brand-accent/20 ml-1">CRM v2.4</span></h1>
+                    <p class="text-xs text-slate-400">Texas Custom Inground Construction</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="hidden md:flex space-x-1">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-brand-blue text-white shadow">
+                    <i class="fa-solid fa-chart-pie mr-2"></i>Dashboard
+                </button>
+                <button onclick="switchTab('pipeline')" id="nav-pipeline" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-white/10">
+                    <i class="fa-solid fa-columns mr-2"></i>Pipeline
+                </button>
+                <button onclick="switchTab('clients')" id="nav-clients" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-white/10">
+                    <i class="fa-solid fa-users mr-2"></i>Clients & Leads
+                </button>
+                <button onclick="switchTab('estimates')" id="nav-estimates" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-white/10">
+                    <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Estimates & Invoices
+                </button>
+                <button onclick="switchTab('deployment')" id="nav-deployment" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-white/10">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2 text-brand-accent"></i>Vercel Deploy
+                </button>
+            </nav>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="openNewClientModal()" class="bg-brand-accent hover:bg-brand-accent/90 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md transition flex items-center">
+                    <i class="fa-solid fa-plus mr-2"></i>New Lead
+                </button>
+                <!-- Mobile menu toggle -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-300 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Dropdown Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-brand-blue px-4 pt-2 pb-4 space-y-1 border-t border-slate-700">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-sm font-medium text-white bg-brand-navy">Dashboard</button>
+            <button onclick="switchTab('pipeline'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-white/10">Pipeline</button>
+            <button onclick="switchTab('clients'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-white/10">Clients & Leads</button>
+            <button onclick="switchTab('estimates'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-white/10">Estimates & Invoices</button>
+            <button onclick="switchTab('deployment'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-white/10">Vercel Deploy Guide</button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto">
+
+        <!-- VIEW 1: DASHBOARD -->
+        <section id="view-dashboard" class="space-y-6 animate-fade-in">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-brand-navy to-brand-blue rounded-2xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold">Texas Pool Operations Center</h2>
+                    <p class="text-slate-300 mt-1">Managing custom inground pools, spas, and outdoor living across Dallas-Fort Worth & Austin.</p>
+                </div>
+                <div class="flex items-center space-x-3 bg-white/10 backdrop-blur-md px-4 py-3 rounded-xl border border-white/15">
+                    <div class="text-right">
+                        <p class="text-xs text-slate-300">Active Season</p>
+                        <p class="font-bold text-brand-accent">Spring / Summer Build</p>
+                    </div>
+                    <i class="fa-solid fa-sun text-brand-accent text-2xl"></i>
+                </div>
+            </div>
+
+            <!-- Key Metric Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Active Projects</p>
+                        <h3 class="text-3xl font-bold text-brand-navy mt-1" id="stat-active-projects">0</h3>
+                        <p class="text-xs text-emerald-600 font-medium mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> In Construction</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-brand-sky flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-person-digging"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Pipeline Value</p>
+                        <h3 class="text-3xl font-bold text-brand-navy mt-1" id="stat-pipeline-value">$0</h3>
+                        <p class="text-xs text-blue-600 font-medium mt-1"><i class="fa-solid fa-wallet mr-1"></i> Potential Revenue</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-dollar-sign"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Leads in Progress</p>
+                        <h3 class="text-3xl font-bold text-brand-navy mt-1" id="stat-leads-progress">0</h3>
+                        <p class="text-xs text-amber-600 font-medium mt-1"><i class="fa-solid fa-phone mr-1"></i> Needs Follow-up</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-fire"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Completed Pools</p>
+                        <h3 class="text-3xl font-bold text-brand-navy mt-1" id="stat-completed-pools">0</h3>
+                        <p class="text-xs text-indigo-600 font-medium mt-1"><i class="fa-solid fa-circle-check mr-1"></i> Handed over</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity & Quick Lead Summary -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Recent Clients / Leads Table Preview -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-brand-navy">Recent Pool Inquiries & Projects</h3>
+                        <button onclick="switchTab('clients')" class="text-sm text-brand-sky hover:underline font-semibold">View All Clients</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    <th class="py-3 px-2">Client Name</th>
+                                    <th class="py-3 px-2">Project Type</th>
+                                    <th class="py-3 px-2">Stage</th>
+                                    <th class="py-3 px-2">Value</th>
+                                    <th class="py-3 px-2 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-client-table" class="divide-y divide-slate-100 text-sm">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quick Actions & Texas Weather/Notes Widget -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg text-brand-navy mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="openNewClientModal()" class="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-between transition group">
+                                <span class="font-medium text-slate-700 group-hover:text-brand-navy"><i class="fa-solid fa-user-plus text-brand-sky mr-3"></i> Add New Client / Lead</span>
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+                            </button>
+                            <button onclick="switchTab('pipeline')" class="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-between transition group">
+                                <span class="font-medium text-slate-700 group-hover:text-brand-navy"><i class="fa-solid fa-columns text-brand-blue mr-3"></i> Open Kanban Pipeline</span>
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+                            </button>
+                            <button onclick="switchTab('estimates')" class="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-between transition group">
+                                <span class="font-medium text-slate-700 group-hover:text-brand-navy"><i class="fa-solid fa-file-invoice text-emerald-600 mr-3"></i> Generate Quote / Invoice</span>
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-100">
+                        <div class="bg-blue-50/70 rounded-xl p-4 border border-blue-100">
+                            <div class="flex items-center space-x-2 text-brand-navy font-semibold text-sm mb-1">
+                                <i class="fa-solid fa-circle-info text-brand-sky"></i>
+                                <span>Texas Soil & Excavation Note</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">Remember to verify caliche / limestone conditions for Austin/Hill Country digs and expansive clay considerations for DFW permits.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: PIPELINE / KANBAN -->
+        <section id="view-pipeline" class="hidden space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-brand-navy">Project Construction Pipeline</h2>
+                    <p class="text-sm text-slate-500">Drag or update status for custom pool builds from initial inquiry to final handover.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="openNewClientModal()" class="bg-brand-accent text-white px-4 py-2 rounded-lg text-sm font-semibold shadow hover:bg-brand-accent/95 transition">
+                        <i class="fa-solid fa-plus mr-1"></i> Add Lead
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kanban Columns Container -->
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
+                <!-- Column 1: Lead -->
+                <div class="bg-slate-200/70 rounded-2xl p-4 flex flex-col kanban-col shadow-inner">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-300">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-slate-500"></span>
+                            <h3 class="font-bold text-sm text-slate-700 uppercase tracking-wide">Leads</h3>
+                        </div>
+                        <span id="count-lead" class="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm">0</span>
+                    </div>
+                    <div id="col-lead" class="space-y-3 flex-1 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'Lead')">
+                        <!-- Cards injected -->
+                    </div>
+                </div>
+
+                <!-- Column 2: Estimate Sent -->
+                <div class="bg-slate-200/70 rounded-2xl p-4 flex flex-col kanban-col shadow-inner">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-300">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <h3 class="font-bold text-sm text-slate-700 uppercase tracking-wide">Estimate Sent</h3>
+                        </div>
+                        <span id="count-estimate" class="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm">0</span>
+                    </div>
+                    <div id="col-estimate" class="space-y-3 flex-1 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'Estimate Sent')">
+                        <!-- Cards injected -->
+                    </div>
+                </div>
+
+                <!-- Column 3: Contract Signed -->
+                <div class="bg-slate-200/70 rounded-2xl p-4 flex flex-col kanban-col shadow-inner">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-300">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                            <h3 class="font-bold text-sm text-slate-700 uppercase tracking-wide">Contract Signed</h3>
+                        </div>
+                        <span id="count-contract" class="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm">0</span>
+                    </div>
+                    <div id="col-contract" class="space-y-3 flex-1 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'Contract Signed')">
+                        <!-- Cards injected -->
+                    </div>
+                </div>
+
+                <!-- Column 4: In Construction -->
+                <div class="bg-slate-200/70 rounded-2xl p-4 flex flex-col kanban-col shadow-inner">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-300">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-brand-sky"></span>
+                            <h3 class="font-bold text-sm text-slate-700 uppercase tracking-wide">In Construction</h3>
+                        </div>
+                        <span id="count-construction" class="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm">0</span>
+                    </div>
+                    <div id="col-construction" class="space-y-3 flex-1 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'In Construction')">
+                        <!-- Cards injected -->
+                    </div>
+                </div>
+
+                <!-- Column 5: Completed -->
+                <div class="bg-slate-200/70 rounded-2xl p-4 flex flex-col kanban-col shadow-inner">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-300">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                            <h3 class="font-bold text-sm text-slate-700 uppercase tracking-wide">Completed</h3>
+                        </div>
+                        <span id="count-completed" class="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm">0</span>
+                    </div>
+                    <div id="col-completed" class="space-y-3 flex-1 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'Completed')">
+                        <!-- Cards injected -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: CLIENTS & LEADS -->
+        <section id="view-clients" class="hidden space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-brand-navy">Client & Lead Directory</h2>
+                    <p class="text-sm text-slate-500">Complete records of homeowners, project types, contact info, and notes.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="client-search" oninput="renderClientsTable()" placeholder="Search clients..." class="pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-sky">
+                    </div>
+                    <button onclick="openNewClientModal()" class="bg-brand-accent text-white px-4 py-2 rounded-xl text-sm font-semibold shadow hover:bg-brand-accent/95 transition flex items-center">
+                        <i class="fa-solid fa-plus mr-2"></i> Add Client
+                    </button>
+                </div>
+            </div>
+
+            <!-- Clients Table Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th class="py-3.5 px-4">Client Name</th>
+                                <th class="py-3.5 px-4">Contact Info</th>
+                                <th class="py-3.5 px-4">Address / Location</th>
+                                <th class="py-3.5 px-4">Project Type</th>
+                                <th class="py-3.5 px-4">Status</th>
+                                <th class="py-3.5 px-4">Project Value</th>
+                                <th class="py-3.5 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="full-client-table" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: ESTIMATES & INVOICES -->
+        <section id="view-estimates" class="hidden space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-brand-navy">Quick Estimate & Invoice Generator</h2>
+                    <p class="text-sm text-slate-500">Build professional quotes for custom inground pools, tanning ledges, spas, and decking.</p>
+                </div>
+                <button onclick="window.print()" class="bg-brand-navy text-white px-4 py-2 rounded-xl text-sm font-semibold shadow hover:bg-brand-blue transition flex items-center">
+                    <i class="fa-solid fa-print mr-2"></i> Print / Save PDF
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Quote Configuration Form -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                    <h3 class="font-bold text-lg text-brand-navy border-b pb-2">Estimate Parameters</h3>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Select Client</label>
+                        <select id="est-client-select" onchange="updateEstimateForm()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-sky outline-none">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="space-y-3 border-t pt-3">
+                        <h4 class="text-sm font-bold text-brand-navy">Base Line Items</h4>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Excavation</label>
+                                <input type="number" id="item-excavation" value="4500" oninput="calculateEstimate()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Steel</label>
+                                <input type="number" id="item-steel" value="3200" oninput="calculateEstimate()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Plumbing</label>
+                                <input type="number" id="item-plumbing" value="4800" oninput="calculateEstimate()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Gunite</label>
+                                <input type="number" id="item-gunite" value="12000" oninput="calculateEstimate()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Tile & Coping</label>
+                                <input type="number" id="item-tile" value="5500" oninput="calculateEstimate()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Decking</label>
+                                <input type="number" id="item-decking" value="8500" oninput="calculateEstimate()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Plaster</label>
+                                <input type="number" id="item-plaster" value="6000" oninput="calculateEstimate()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Equipment</label>
+                                <input type="number" id="item-equipment" value="7500" oninput="calculateEstimate()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 border-t pt-3">
+                        <h4 class="text-sm font-bold text-brand-navy">Options & Add-ons</h4>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="opt-water-feature" onchange="toggleOptionInput('val-water-feature'); calculateEstimate()" class="rounded text-brand-sky">
+                                    <span class="font-medium text-slate-700">Water Feature</span>
+                                </label>
+                                <div id="val-water-feature" class="hidden pl-6 mt-1">
+                                    <input type="number" id="cost-water-feature" placeholder="Cost" value="3500" oninput="calculateEstimate()" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="opt-spa" onchange="toggleOptionInput('val-spa'); calculateEstimate()" class="rounded text-brand-sky">
+                                    <span class="font-medium text-slate-700">Spa</span>
+                                </label>
+                                <div id="val-spa" class="hidden pl-6 mt-1">
+                                    <input type="number" id="cost-spa" placeholder="Cost" value="14000" oninput="calculateEstimate()" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="opt-kitchen" onchange="toggleOptionInput('val-kitchen'); calculateEstimate()" class="rounded text-brand-sky">
+                                    <span class="font-medium text-slate-700">Outdoor Kitchen</span>
+                                </label>
+                                <div id="val-kitchen" class="hidden pl-6 mt-1">
+                                    <input type="number" id="cost-kitchen" placeholder="Cost" value="12000" oninput="calculateEstimate()" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="opt-pergola" onchange="toggleOptionInput('val-pergola'); calculateEstimate()" class="rounded text-brand-sky">
+                                    <span class="font-medium text-slate-700">Pergola or Pavilion</span>
+                                </label>
+                                <div id="val-pergola" class="hidden pl-6 mt-1">
+                                    <input type="number" id="cost-pergola" placeholder="Cost" value="8500" oninput="calculateEstimate()" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="saveEstimateToClient()" class="w-full bg-brand-accent hover:bg-brand-accent/90 text-white font-semibold py-3 rounded-xl transition shadow">
+                        Save & Assign to Client
+                    </button>
+                </div>
+
+                <!-- Printable/Previewable Invoice Sheet -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-8 flex flex-col justify-between">
+                    <div>
+                        <!-- Header -->
+                        <div class="flex justify-between items-start border-b border-slate-200 pb-6">
+                            <div>
+                                <div class="flex items-center space-x-2 text-brand-navy font-bold text-xl">
+                                    <i class="fa-solid fa-water-ladder text-brand-sky"></i>
+                                    <span>LANDRY POOLS LLC</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">Custom Inground Pools & Outdoor Living</p>
+                                <p class="text-xs text-slate-500">Dallas / Fort Worth & Austin, TX</p>
+                            </div>
+                            <div class="text-right">
+                                <h4 class="font-bold text-brand-navy text-lg">PROPOSAL & ESTIMATE</h4>
+                                <p class="text-xs text-slate-400" id="inv-date">Date: Oct 24, 2026</p>
+                                <p class="text-xs text-brand-accent font-semibold mt-1">Valid for 30 Days</p>
+                            </div>
+                        </div>
+
+                        <!-- Client Info Display -->
+                        <div class="grid grid-cols-2 gap-4 my-6 text-sm">
+                            <div>
+                                <p class="text-xs font-semibold uppercase text-slate-400">Prepared For:</p>
+                                <p id="preview-client-name" class="font-bold text-brand-navy text-base mt-0.5">Select a client</p>
+                                <p id="preview-client-address" class="text-slate-600 text-xs">Texas Address</p>
+                                <p id="preview-client-contact" class="text-slate-600 text-xs">Phone / Email</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs font-semibold uppercase text-slate-400">Project Type:</p>
+                                <p id="preview-project-type" class="font-bold text-brand-sky text-base mt-0.5">Inground Pool & Spa</p>
+                                <p class="text-xs text-slate-500">Estimated Build Time: 6 - 8 Weeks</p>
+                            </div>
+                        </div>
+
+                        <!-- Line Items Table -->
+                        <table class="w-full text-left border-collapse my-4">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-xs font-semibold text-slate-400 uppercase">
+                                    <th class="py-2">Description</th>
+                                    <th class="py-2 text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoice-items-list" class="divide-y divide-slate-100 text-sm">
+                                <!-- Generated line items -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Total Calculation Box -->
+                    <div class="border-t border-slate-200 pt-6 mt-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-slate-500 text-sm">Subtotal</span>
+                            <span id="inv-subtotal" class="font-semibold text-slate-700">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-slate-500 text-sm">Texas State / Local Tax (Permits & Materials apportioned)</span>
+                            <span id="inv-tax" class="font-semibold text-slate-700">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-brand-navy text-white p-4 rounded-xl">
+                            <div>
+                                <span class="font-bold text-base">Total Investment</span>
+                                <p class="text-[11px] text-slate-300">Includes excavation, steel rebar, gunite, plumbing, and equipment.</p>
+                            </div>
+                            <span id="inv-total" class="text-2xl font-bold text-brand-accent">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: VERCEL DEPLOYMENT GUIDE -->
+        <section id="view-deployment" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 max-w-4xl mx-auto space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-200 pb-6">
+                    <div class="w-12 h-12 rounded-xl bg-black text-white flex items-center justify-center text-2xl">
+                        <i class="fa-solid fa-triangle-exclamation transform rotate-180"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-brand-navy">Deploying Landry Pools CRM to Vercel</h2>
+                        <p class="text-sm text-slate-500">Step-by-step instructions to push this app live in under 2 minutes.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4 text-sm text-slate-700">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-brand-navy mb-2 flex items-center"><span class="bg-brand-sky text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-xs mr-2">1</span> Save Code to a Local File</h3>
+                        <p class="text-slate-600">Ensure the code above is saved as <code class="bg-slate-200 px-1.5 py-0.5 rounded font-mono text-xs text-brand-navy">index.html</code> inside a project folder on your computer.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-brand-navy mb-2 flex items-center"><span class="bg-brand-sky text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-xs mr-2">2</span> Push to GitHub</h3>
+                        <p class="text-slate-600 mb-2">Initialize git in your folder and push to a new GitHub repository:</p>
+                        <pre class="bg-slate-900 text-slate-200 p-3 rounded-lg font-mono text-xs overflow-x-auto"><code>git init
+git add index.html
+git commit -m "Initial commit - Landry Pools CRM"
+git branch -M main
+git remote add origin https://github.com/your-username/landry-pools-crm.git
+git push -u origin main</code></pre>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-brand-navy mb-2 flex items-center"><span class="bg-brand-sky text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-xs mr-2">3</span> Import Project into Vercel</h3>
+                        <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                            <li>Log in to your <a href="https://vercel.com" target="_blank" class="text-brand-sky underline font-medium">Vercel Dashboard</a>.</li>
+                            <li>Click <strong>Add New...</strong> &gt; <strong>Project</strong>.</li>
+                            <li>Select your <code class="bg-slate-200 px-1 rounded font-mono text-xs">landry-pools-crm</code> repository from GitHub and click <strong>Import</strong>.</li>
+                            <li>Leave build settings as default (static HTML requires no build command) and click <strong>Deploy</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                        <h3 class="font-bold text-emerald-900 mb-1 flex items-center"><i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i> Instant Live URL</h3>
+                        <p class="text-xs text-emerald-700">Vercel will build and assign a secure HTTPS URL (<code class="font-mono">landry-pools-crm.vercel.app</code>) instantly, with automatic SSL and global CDN caching.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- NEW / EDIT CLIENT MODAL -->
+    <div id="client-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl animate-fade-in">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 id="modal-title" class="font-bold text-lg text-brand-navy">Add New Pool Client / Lead</h3>
+                <button onclick="closeClientModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="client-form" onsubmit="handleClientSubmit(event)" class="space-y-4 text-sm">
+                <input type="hidden" id="client-id">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Client Name</label>
+                        <input type="text" id="form-name" required placeholder="e.g. Robert & Sarah Vance" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-brand-sky">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Phone Number</label>
+                        <input type="text" id="form-phone" required placeholder="(214) 555-0199" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-brand-sky">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email Address</label>
+                        <input type="email" id="form-email" required placeholder="robert@example.com" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-brand-sky">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Project Value ($)</label>
+                        <input type="number" id="form-value" required value="75000" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-brand-sky">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Texas Property Address</label>
+                    <input type="text" id="form-address" required placeholder="4204 Preston Rd, Frisco, TX" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-brand-sky">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Project Type</label>
+                        <select id="form-type" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-brand-sky">
+                            <option value="Inground Pool & Spa">Inground Pool & Spa</option>
+                            <option value="Geometric Pool">Geometric Pool</option>
+                            <option value="Freeform Lagoon">Freeform Lagoon</option>
+                            <option value="Standalone Spa">Standalone Spa</option>
+                            <option value="Outdoor Living & Kitchen">Outdoor Living & Kitchen</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pipeline Stage</label>
+                        <select id="form-status" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-brand-sky">
+                            <option value="Lead">Lead</option>
+                            <option value="Estimate Sent">Estimate Sent</option>
+                            <option value="Contract Signed">Contract Signed</option>
+                            <option value="In Construction">In Construction</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Notes / Site Visit Log</label>
+                    <textarea id="form-notes" rows="2" placeholder="Requested baja shelf, fire bowls, and travertine coping..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-brand-sky"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t">
+                    <button type="button" onclick="closeClientModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-600 font-semibold hover:bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-accent text-white font-semibold hover:bg-brand-accent/90 shadow">Save Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Mock / LocalStorage Data Initialization for Landry Pools
+        const DEFAULT_CLIENTS = [
+            {
+                id: 'LP-101',
+                name: 'Marcus & Elena Sterling',
+                phone: '(214) 843-9021',
+                email: 'msterling@texasdev.com',
+                address: '5420 Lakeway Blvd, Austin, TX',
+                type: 'Freeform Lagoon',
+                status: 'In Construction',
+                value: 88000,
+                notes: 'Excavation complete. Steel rebar inspection passed.'
+            },
+            {
+                id: 'LP-102',
+                name: 'Dr. Harrison Wells',
+                phone: '(817) 492-3311',
+                email: 'hwells@ftworthmed.org',
+                address: '1209 Colleyville Blvd, Colleyville, TX',
+                type: 'Geometric Pool',
+                status: 'Estimate Sent',
+                value: 72000,
+                notes: 'Requested estimate with raised spa and travertine decking.'
+            },
+            {
+                id: 'LP-103',
+                name: 'Brandon & Chloe Davis',
+                phone: '(512) 332-9011',
+                email: 'bdavis@austintech.io',
+                address: '310 Barton Creek Rd, Austin, TX',
+                type: 'Inground Pool & Spa',
+                status: 'Contract Signed',
+                value: 94000,
+                notes: 'Permits submitted to city. HOA approval secured.'
+            },
+            {
+                id: 'LP-104',
+                name: 'Samantha Vance',
+                phone: '(972) 555-8392',
+                email: 'svance@vancethem.com',
+                address: '8820 Legacy Dr, Frisco, TX',
+                type: 'Standalone Spa',
+                status: 'Completed',
+                value: 32000,
+                notes: 'Paster complete, startup and orientation done.'
+            },
+            {
+                id: 'LP-105',
+                name: 'Carlos & Sofia Ramirez',
+                phone: '(210) 441-9922',
+                email: 'carlos@ramirezlaw.com',
+                address: '14 San Pedro Ave, San Antonio, TX',
+                type: 'Inground Pool & Spa',
+                status: 'Lead',
+                value: 68000,
+                notes: 'Inquiry from website form. Wants backyard consultation.'
+            }
+        ];
+
+        let clients = JSON.parse(localStorage.getItem('landry_pools_clients')) || DEFAULT_CLIENTS;
+
+        function saveClients() {
+            localStorage.setItem('landry_pools_clients', JSON.stringify(clients));
+            initApp();
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'pipeline', 'clients', 'estimates', 'deployment'];
+            tabs.forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (navBtn) {
+                    navBtn.className = "px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-white/10";
+                }
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.className = "px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-brand-blue text-white shadow";
+            }
+            if (tabId === 'estimates') {
+                populateEstimateClientDropdown();
+                calculateEstimate();
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Initialize App & Render Metrics, Tables, Kanban
+        function initApp() {
+            renderMetrics();
+            renderDashboardTable();
+            renderKanbanBoard();
+            renderClientsTable();
+            populateEstimateClientDropdown();
+        }
+
+        function renderMetrics() {
+            const activeProjects = clients.filter(c => c.status === 'In Construction').length;
+            const pipelineValue = clients.reduce((acc, c) => acc + (Number(c.value) || 0), 0);
+            const leadsInProgress = clients.filter(c => c.status === 'Lead' || c.status === 'Estimate Sent').length;
+            const completedPools = clients.filter(c => c.status === 'Completed').length;
+
+            document.getElementById('stat-active-projects').innerText = activeProjects;
+            document.getElementById('stat-pipeline-value').innerText = '$' + pipelineValue.toLocaleString();
+            document.getElementById('stat-leads-progress').innerText = leadsInProgress;
+            document.getElementById('stat-completed-pools').innerText = completedPools;
+        }
+
+        function renderDashboardTable() {
+            const tbody = document.getElementById('dashboard-client-table');
+            tbody.innerHTML = '';
+            const recent = clients.slice(0, 5);
+            recent.forEach(c => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3 px-2 font-semibold text-brand-navy">${c.name}</td>
+                        <td class="py-3 px-2 text-slate-600">${c.type}</td>
+                        <td class="py-3 px-2"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(c.status)}">${c.status}</span></td>
+                        <td class="py-3 px-2 font-medium text-slate-700">$${Number(c.value).toLocaleString()}</td>
+                        <td class="py-3 px-2 text-right">
+                            <button onclick="editClient('${c.id}')" class="text-brand-sky hover:text-brand-blue p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'Lead': return 'bg-slate-100 text-slate-700';
+                case 'Estimate Sent': return 'bg-amber-100 text-amber-800';
+                case 'Contract Signed': return 'bg-blue-100 text-blue-800';
+                case 'In Construction': return 'bg-brand-sky/20 text-brand-sky font-bold';
+                case 'Completed': return 'bg-emerald-100 text-emerald-800';
+                default: return 'bg-slate-100 text-slate-700';
+            }
+        }
+
+        // Kanban Board Rendering
+        function renderKanbanBoard() {
+            const columns = ['Lead', 'Estimate Sent', 'Contract Signed', 'In Construction', 'Completed'];
+            columns.forEach(col => {
+                const container = document.getElementById(`col-${col.toLowerCase().replace(' ', '')}`);
+                const countBadge = document.getElementById(`count-${col.toLowerCase().replace(' ', '')}`);
+                if (!container) return;
+                container.innerHTML = '';
+                const colClients = clients.filter(c => c.status === col);
+                if (countBadge) countBadge.innerText = colClients.length;
+
+                colClients.forEach(c => {
+                    container.innerHTML += `
+                        <div draggable="true" ondragstart="drag(event, '${c.id}')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-grab active:cursor-grabbing hover:shadow-md transition space-y-2">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-brand-navy text-sm">${c.name}</h4>
+                                <button onclick="editClient('${c.id}')" class="text-slate-400 hover:text-brand-sky text-xs"><i class="fa-solid fa-pen"></i></button>
+                            </div>
+                            <p class="text-xs text-slate-500 font-medium"><i class="fa-solid fa-water text-brand-sky mr-1"></i> ${c.type}</p>
+                            <p class="text-xs text-slate-400 truncate"><i class="fa-solid fa-location-dot mr-1"></i> ${c.address}</p>
+                            <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs">
+                                <span class="font-bold text-emerald-700">$${Number(c.value).toLocaleString()}</span>
+                                <button onclick="advanceStatus('${c.id}')" class="bg-slate-100 hover:bg-brand-sky hover:text-white px-2 py-1 rounded transition text-[11px] font-medium text-slate-600">Advance <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        // Drag and Drop
+        let draggedClientId = null;
+        function drag(ev, id) {
+            draggedClientId = id;
+            ev.dataTransfer.setData("text", id);
+        }
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+        function drop(ev, newStatus) {
+            ev.preventDefault();
+            if (draggedClientId) {
+                const client = clients.find(c => c.id === draggedClientId);
+                if (client) {
+                    client.status = newStatus;
+                    saveClients();
+                }
+            }
+        }
+
+        function advanceStatus(id) {
+            const stages = ['Lead', 'Estimate Sent', 'Contract Signed', 'In Construction', 'Completed'];
+            const client = clients.find(c => c.id === id);
+            if (client) {
+                const idx = stages.indexOf(client.status);
+                if (idx < stages.length - 1) {
+                    client.status = stages[idx + 1];
+                    saveClients();
+                }
+            }
+        }
+
+        // Render Full Clients Table
+        function renderClientsTable() {
+            const tbody = document.getElementById('full-client-table');
+            const search = document.getElementById('client-search').value.toLowerCase();
+            tbody.innerHTML = '';
+            
+            const filtered = clients.filter(c => c.name.toLowerCase().includes(search) || c.address.toLowerCase().includes(search) || c.type.toLowerCase().includes(search));
+
+            filtered.forEach(c => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="py-3 px-4 font-semibold text-brand-navy">${c.name}</td>
+                        <td class="py-3 px-4 text-slate-600 text-xs">
+                            <div><i class="fa-solid fa-phone mr-1 text-slate-400"></i>${c.phone}</div>
+                            <div><i class="fa-solid fa-envelope mr-1 text-slate-400"></i>${c.email}</div>
+                        </td>
+                        <td class="py-3 px-4 text-slate-600 text-xs">${c.address}</td>
+                        <td class="py-3 px-4 font-medium text-slate-700">${c.type}</td>
+                        <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(c.status)}">${c.status}</span></td>
+                        <td class="py-3 px-4 font-bold text-slate-700">$${Number(c.value).toLocaleString()}</td>
+                        <td class="py-3 px-4 text-right space-x-2">
+                            <button onclick="editClient('${c.id}')" class="text-brand-sky hover:text-brand-blue" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteClient('${c.id}')" class="text-rose-500 hover:text-rose-700" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Modal Controls
+        function openNewClientModal() {
+            document.getElementById('modal-title').innerText = "Add New Pool Client / Lead";
+            document.getElementById('client-id').value = "";
+            document.getElementById('form-name').value = "";
+            document.getElementById('form-phone').value = "";
+            document.getElementById('form-email').value = "";
+            document.getElementById('form-address').value = "";
+            document.getElementById('form-value').value = "75000";
+            document.getElementById('form-notes').value = "";
+            document.getElementById('client-modal').classList.remove('hidden');
+        }
+
+        function editClient(id) {
+            const client = clients.find(c => c.id === id);
+            if (!client) return;
+            document.getElementById('modal-title').innerText = "Edit Client / Project";
+            document.getElementById('client-id').value = client.id;
+            document.getElementById('form-name').value = client.name;
+            document.getElementById('form-phone').value = client.phone;
+            document.getElementById('form-email').value = client.email;
+            document.getElementById('form-address').value = client.address;
+            document.getElementById('form-type').value = client.type;
+            document.getElementById('form-status').value = client.status;
+            document.getElementById('form-value').value = client.value;
+            document.getElementById('form-notes').value = client.notes || "";
+            document.getElementById('client-modal').classList.remove('hidden');
+        }
+
+        function closeClientModal() {
+            document.getElementById('client-modal').classList.add('hidden');
+        }
+
+        function handleClientSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('client-id').value;
+            const name = document.getElementById('form-name').value;
+            const phone = document.getElementById('form-phone').value;
+            const email = document.getElementById('form-email').value;
+            const address = document.getElementById('form-address').value;
+            const type = document.getElementById('form-type').value;
+            const status = document.getElementById('form-status').value;
+            const value = Number(document.getElementById('form-value').value);
+            const notes = document.getElementById('form-notes').value;
+
+            if (id) {
+                const client = clients.find(c => c.id === id);
+                if (client) {
+                    client.name = name;
+                    client.phone = phone;
+                    client.email = email;
+                    client.address = address;
+                    client.type = type;
+                    client.status = status;
+                    client.value = value;
+                    client.notes = notes;
+                }
+            } else {
+                const newId = 'LP-' + Math.floor(100 + Math.random() * 900);
+                clients.unshift({ id: newId, name, phone, email, address, type, status, value, notes });
+            }
+
+            saveClients();
+            closeClientModal();
+        }
+
+        function deleteClient(id) {
+            if (confirm("Are you sure you want to remove this client record?")) {
+                clients = clients.filter(c => c.id !== id);
+                saveClients();
+            }
+        }
+
+        // Estimate Generator Logic
+        function populateEstimateClientDropdown() {
+            const select = document.getElementById('est-client-select');
+            select.innerHTML = '';
+            clients.forEach(c => {
+                select.innerHTML += `<option value="${c.id}">${c.name} (${c.address})</option>`;
+            });
+            updateEstimateForm();
+        }
+
+        function updateEstimateForm() {
+            const clientId = document.getElementById('est-client-select').value;
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                document.getElementById('preview-client-name').innerText = client.name;
+                document.getElementById('preview-client-address').innerText = client.address;
+                document.getElementById('preview-client-contact').innerText = `${client.phone} • ${client.email}`;
+            }
+            calculateEstimate();
+        }
+
+        function calculateEstimate() {
+            const style = document.getElementById('est-style').value;
+            const gallons = Number(document.getElementById('est-gallons').value) || 18000;
+            const hasSpa = document.getElementById('est-has-spa').value === 'yes';
+            const deckingSqft = Number(document.getElementById('est-decking-sqft').value) || 800;
+            const hasFire = document.getElementById('addon-fire').checked;
+            const hasLighting = document.getElementById('addon-lighting').checked;
+            const hasAutomation = document.getElementById('addon-automation').checked;
+
+            let basePrice = 65000;
+            let styleName = "Classic Rectangular Shotcrete Pool";
+            if (style === 'freeform') { basePrice = 78000; styleName = "Custom Freeform Lagoon with Rock Features"; }
+            if (style === 'geometric') { basePrice = 85000; styleName = "Modern L-Shape with Baja Shelf"; }
+            if (style === 'spa') { basePrice = 28000; styleName = "Standalone Custom Heated Spa"; }
+
+            document.getElementById('preview-project-type').innerText = styleName;
+
+            let itemsHTML = `
+                <tr>
+                    <td class="py-2.5 text-slate-700">${styleName} (~${gallons.toLocaleString()} gal, Excavation & Shotcrete)</td>
+                    <td class="py-2.5 text-right font-medium">$${basePrice.toLocaleString()}</td>
+                </tr>
+            `;
+
+            let subtotal = basePrice;
+
+            if (hasSpa && style !== 'spa') {
+                subtotal += 14000;
+                itemsHTML += `
+                    <tr>
+                        <td class="py-2.5 text-slate-700">Elevated Spillover Spa & Equipment Integration</td>
+                        <td class="py-2.5 text-right font-medium">$14,000</td>
+                    </tr>
+                `;
+            }
+
+            const deckingCost = deckingSqft * 18;
+            subtotal += deckingCost;
+            itemsHTML += `
+                <tr>
+                    <td class="py-2.5 text-slate-700">Travertine Coping & Decking (${deckingSqft} sq. ft. @ $18/sq.ft)</td>
+                    <td class="py-2.5 text-right font-medium">$${deckingCost.toLocaleString()}</td>
+                </tr>
+            `;
+
+            if (hasFire) {
+                subtotal += 4500;
+                itemsHTML += `
+                    <tr>
+                        <td class="py-2.5 text-slate-700">Custom Gas Fire Pit & 2 Fire Bowls</td>
+                        <td class="py-2.5 text-right font-medium">$4,500</td>
+                    </tr>
+                `;
+            }
+            if (hasLighting) {
+                subtotal += 1800;
+                itemsHTML += `
+                    <tr>
+                        <td class="py-2.5 text-slate-700">Jandy/Pentair RGB LED Color Changing Lights</td>
+                        <td class="py-2.5 text-right font-medium">$1,800</td>
+                    </tr>
+                `;
+            }
+            if (hasAutomation) {
+                subtotal += 3200;
+                itemsHTML += `
+                    <tr>
+                        <td class="py-2.5 text-slate-700">Smart Phone Wireless Pool Automation System</td>
+                        <td class="py-2.5 text-right font-medium">$3,200</td>
+                    </tr>
+                `;
+            }
+
+            const tax = Math.round(subtotal * 0.045); // Partial materials tax apportionment for Texas construction
+            const total = subtotal + tax;
+
+            document.getElementById('invoice-items-list').innerHTML = itemsHTML;
+            document.getElementById('inv-subtotal').innerText = '$' + subtotal.toLocaleString();
+            document.getElementById('inv-tax').innerText = '$' + tax.toLocaleString();
+            document.getElementById('inv-total').innerText = '$' + total.toLocaleString();
+
+            // Store calculated total globally for saving
+            window.currentCalculatedTotal = total;
+        }
+
+        function saveEstimateToClient() {
+            const clientId = document.getElementById('est-client-select').value;
+            const client = clients.find(c => c.id === clientId);
+            if (client && window.currentCalculatedTotal) {
+                client.value = window.currentCalculatedTotal;
+                client.status = 'Estimate Sent';
+                saveClients();
+                alert(`Estimate of $${window.currentCalculatedTotal.toLocaleString()} successfully assigned to ${client.name} and stage updated to Estimate Sent!`);
+                switchTab('pipeline');
+            }
+        }
+
+        // Run on load
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
